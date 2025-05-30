@@ -1,5 +1,5 @@
 from django import forms
-from models import *
+from auctions.models import *
 
 class NewListingForm(forms.ModelForm):
     class Meta:
