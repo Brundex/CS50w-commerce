@@ -3,8 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 
-from .models import User
+from .models import *
 
 
 def index(request):
@@ -61,3 +62,9 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+    
+class NewListingForm(forms.ModelForm):
+    class Meta:
+        model = Listing
+        exclude = ["owner", "current_bid", "is_open"]
+        
