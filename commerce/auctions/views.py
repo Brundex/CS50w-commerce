@@ -11,7 +11,9 @@ from .models import *
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listings": Listing.objects.filter(is_open=True)
+    })
 
 
 def login_view(request):
@@ -85,4 +87,3 @@ def new_listing(request):
     return render(request, "auctions/new_listing.html", {
         "form": NewListingForm()
     })
-    

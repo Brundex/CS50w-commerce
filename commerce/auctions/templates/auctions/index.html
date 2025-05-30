@@ -2,7 +2,16 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    TODO
-    {% comment %} For listing in listings, {{listing.title}}, etc {% endcomment %}
+        {% for listing in listings %}
+                <div>
+                    <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
+                    <h3><strong>{{ listing.title }}</strong></h3>
+                    <p>{{ listing.description }}</p>
+                    {% if listing.current_bid == 0 %}
+                        <p>Current bid: No bids yet</p>
+                    {% else %}
+                        <p>Current bid: {{listing.current_bid }}</p>
+                    {% endif %}
+                </div>
+        {% endfor %}
 {% endblock %}
