@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from auctions.forms import *
@@ -63,4 +64,25 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+ 
+@login_required   
+def new_listing(request):
+    if request.method == "POST":
+        form = NewListingForm(request.POST)
+        
+        if form.is_valid():
+            listing = form.save(commit=False)
+            listing.owner = request.user
+            listing.save()
+            print(f"Listing created successfully by {request.user}: {listing}")
+            return redirect("index") #TODO: This should render the listing's page.
+        
+        else:
+            return render(request, "auctions/new_listing.html", {
+                "form": NewListingForm()
+            })
+        
+    return render(request, "auctions/new_listing.html", {
+        "form": NewListingForm()
+    })
     
