@@ -1,0 +1,36 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1><strong>{{ listing.title | upper }}</strong></h1>
+                <div>
+                    <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
+                    <ul>
+                        <li>Posted by user: <strong>{{ listing.owner }}</strong></li>
+                        <li>Description: {{ listing.description }}</li>
+                        <li>Category: {{ listing.category}}</li>
+                        <li>Starting bid: {{ listing.starting_bid }}</li>
+
+                        {% if listing.current_bid == 0 %}
+                            <li>Current bid: No bids yet</li>
+                        {% else %}
+                            <li>Current bid: {{listing.current_bid }}</li>
+                        {% endif %} 
+                        <li>Status: {% if listing.is_open == True %}Open{% else%}Closed{% endif %}</li>
+                    </ul>
+                    <form action="" method="post">
+
+                        <input type="number" placeholder="Place your bid">
+                        <input type="submit">
+                    </form>
+
+                    {% comment %} TODO lógica si está en watchlist, sacarlo de watchlist {% endcomment %}
+                    <form action="" method="post">
+                   
+                        <button type="submit">Add to watchlist</button>
+                    </form>
+
+                    {% comment %} TODO craer comentario {% endcomment %}
+                    {% comment %} TODO listar comentarios {% endcomment %}
+                </div>
+
+{% endblock %}

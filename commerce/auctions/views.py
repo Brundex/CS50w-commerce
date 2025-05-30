@@ -82,8 +82,32 @@ def new_listing(request):
         else:
             return render(request, "auctions/new_listing.html", {
                 "form": NewListingForm()
-            })
+            })  
         
     return render(request, "auctions/new_listing.html", {
         "form": NewListingForm()
     })
+
+def listing(request, id):
+    return render(request, "auctions/listing.html", {
+        "listing": Listing.objects.get(id=id)
+    })
+    
+def toggle_watchlist(request, id):
+    # Si 
+    return
+
+def place_bid(request, id):
+    # Tiene que ser mayor a current_bid. SI no hay bids, tiene que ser mayor o igual a starting_bid
+    # Actualiza current_bid
+    # El owner no puede pujar
+    return
+
+def close_listing(request, id):
+    # Solo puede ser hecho por el owner
+    # Tiene que haber al menos un bid. Busco el User Id que puso el current_bid
+    # is_open cambia a False
+    return
+
+def add_comment(request, id):
+    return   

@@ -3,7 +3,9 @@
 {% block body %}
     <h2>Active Listings</h2>
         {% for listing in listings %}
+            
                 <div>
+                
                     <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
                     <h3><strong>{{ listing.title }}</strong></h3>
                     <p>{{ listing.description }}</p>
@@ -12,6 +14,9 @@
                     {% else %}
                         <p>Current bid: {{listing.current_bid }}</p>
                     {% endif %}
+                    <p><a href="{% url 'listing' listing.id %}">Go to this listing's page</a></p>
+                
                 </div>
+            
         {% endfor %}
 {% endblock %}
