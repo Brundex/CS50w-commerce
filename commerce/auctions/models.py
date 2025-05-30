@@ -19,10 +19,10 @@ class Listing(models.Model):
     title = models.CharField(max_length=32)
     description = models.CharField(max_length=64)
     category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
-    img_url = models.URLField(blank=True, null=True)
+    img_url = models.URLField(blank=True, null=True, verbose_name="image URL")
     
     # Bidding
-    starting_bid = models.DecimalField(max_digits=9, decimal_places=2)
+    starting_bid = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="starting bid")
     current_bid = models.DecimalField(max_digits=9, decimal_places=9, default=0)
     
     # State
