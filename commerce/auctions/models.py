@@ -28,6 +28,9 @@ class Listing(models.Model):
     # State
     is_open = models.BooleanField(default=True)
     
+    def highest_bidder(self):
+        return Bid.objects.get(listing=self, amount=self.current_bid).user if self.current_bid > 0 else None
+    
     
     
 
@@ -38,6 +41,8 @@ class Bid(models.Model):
     
     # Bid values
     amount = models.DecimalField(max_digits=9, decimal_places=2)
+    
+    
 
 class Comment(models.Model):
     listing = models.ForeignKey("Listing", on_delete=models.CASCADE)
