@@ -10,26 +10,38 @@
                         <li>Category: {{ listing.category}}</li>
                         <li>Starting bid: {{ listing.starting_bid }}</li>
 
+                        {% if not listing.is_open %}
+                        <li>Winning bid: {{ listing.current_bid }}</li>
+                        <li>Winner: {% if listing.highest_bidder == request.user %} YOU! {{ listing.highest_bidder.username }}{% else %} {{ listing.highest_bidder.username }}{% endif %}</li>
+                    {% else %}
                         {% if listing.current_bid == 0 %}
                             <li>Current bid: No bids yet</li>
                         {% else %}
-                            <li>Current bid: {{listing.current_bid }}</li>
+                            <li>Current bid: {{ listing.current_bid }}</li>
+                            <li>
+                                <form action="{% url 'place_bid' listing.id %}"method="post">
+                                    {% csrf_token %}
+                                    {{ form }}
+                                    <input type="submit">
+                                </form>
+                                {% if messages %}
+                                    <ul class="messages">
+                                        {% for message in messages %}
+                                            <li class="{{ message.tags }}">{{ message }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
                         {% endif %}
-                        <li>
-                            <form action="{% url 'place_bid' listing.id %}"method="post">
-                                {% csrf_token %}
-                                {{ form }}
-                                <input type="submit">
-                            </form>
-                            {% if messages %}
-                                <ul class="messages">
-                                    {% for message in messages %}
-                                        <li class="{{ message.tags }}">{{ message }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </li>
-                        <li>Status: {% if listing.is_open == True %}Open{% else%}Closed{% endif %}</li>
+                    {% endif %}
+                        
+                        <li>Status: {% if listing.is_open %}Open{% else%}Closed{% endif %}</li>
+                        {% if request.user == listing.owner %}
+                        <form action="{% url 'close_listing' listing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Close This Listing</button>
+                        </form>
+                        {% endif %}
                     </ul>
 
                     <form action="{% url 'toggle_watchlist' listing.id %}" method="post">

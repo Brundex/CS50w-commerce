@@ -126,6 +126,14 @@ def place_bid(request, id):
         except InvalidOperation:
             return HttpResponse("Invalid value", status=500)
         
+        if not listing.is_open:
+            messages.error(request, "You cannot place a bid on a closed listing.")
+            return redirect("listing_detail", id=listing.id)
+        
+        if listing.owner == request.user:
+            messages.error(request, "You cannot place a bid on your own listing.")
+            return redirect("listing_detail", id=listing.id)
+        
         if form.is_valid():
             amount = form.cleaned_data["amount"]
             amount = Decimal(amount).quantize(Decimal("0.000000001"), rounding=ROUND_DOWN)
@@ -135,7 +143,7 @@ def place_bid(request, id):
                 bid.user = request.user
                 listing.current_bid = amount
                 bid.save()
-                print("Bid saved correctly")
+                
                 listing.save()
                 return redirect("listing_detail", id=listing.id)
             else:
@@ -145,18 +153,26 @@ def place_bid(request, id):
         
         return redirect("listing_detail", id=listing.id)
 
-        
-        
-        
-    # Tiene que ser mayor a current_bid. SI no hay bids, tiene que ser mayor o igual a starting_bid
-    # Actualiza current_bid
-    # El owner no puede pujar
-
+@login_required
 def close_listing(request, id):
-    # Solo puede ser hecho por el owner
-    # Tiene que haber al menos un bid. Busco el User Id que puso el current_bid
-    # is_open cambia a False
-    return
+    if request.method == "POST":
+        try:
+            listing = Listing.objects.get(id=id)
+        except Listing.DoesNotExist:
+            return HttpResponse("Listing not found", status=404)
+        
+        if request.user != listing.owner:
+            return HttpResponse("You are not allowed to close this listing.", status=403)
+
+        if listing.current_bid == 0:
+            messages.error(request, "Cannot close a listing without bids.")
+            return redirect("listing_detail", id=listing.id)
+
+        listing.is_open = False
+        listing.save()
+        
+        return redirect("listing_detail", id=listing.id)
+    return redirect("listing_detail", id=id)
 
 def add_comment(request, id):
     return   
