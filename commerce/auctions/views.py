@@ -15,7 +15,7 @@ from .models import *
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter(is_open=True)
+        "listings": Listing.objects.filter()
     })
 
 
@@ -196,3 +196,29 @@ def add_comment(request, id):
             messages.error(request, "Invalid comment submission.")
             return redirect("listing_detail", id=listing.id)
     return HttpResponseNotAllowed(["POST"])
+
+@login_required
+def watchlist(request):
+    user = request.user
+    watchlist_items = user.watchlist.all()
+    
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist_items,
+        "user": user
+    })
+    
+def categories(request):
+    categories = Listing.CATEGORY_CHOICES
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
+    
+def category_listings(request, category):
+    listings = Listing.objects.filter(category=category, is_open=True)
+    
+    if not listings:
+        messages.info(request, f"No listings found in the '{category}' category.")
+    return render(request, "auctions/category_listings.html", {
+        "listings": listings,
+        "category": category
+    })

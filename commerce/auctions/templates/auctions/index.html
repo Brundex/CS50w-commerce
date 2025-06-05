@@ -2,19 +2,34 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-        {% for listing in listings %}
-                <div>
-                    <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
-                    <h3><strong>{{ listing.title }}</strong></h3>
-                    <p>{{ listing.description }}</p>
-                    {% if listing.current_bid == 0 %}
-                        <p>Current bid: No bids yet</p>
-                    {% else %}
-                        <p>Current bid: {{listing.current_bid }}</p>
-                    {% endif %}
-                    <p><a href="{% url 'listing_detail' listing.id %}">Go to this listing's page</a></p>
-                
-                </div>
-            
-        {% endfor %}
+    {% for listing in listings %}
+        {% if listing.is_open %}
+            <div>
+                <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
+                <h3><strong>{{ listing.title }}</strong></h3>
+                <p>{{ listing.description }}</p>
+                {% if listing.current_bid == 0 %}
+                    <p>Current bid: No bids yet</p>
+                {% else %}
+                    <p>Current bid: {{ listing.current_bid }}</p>
+                {% endif %}
+                <p><a href="{% url 'listing_detail' listing.id %}">Go to this listing's page</a></p>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <hr>
+    <h2>Closed Listings</h2>
+    {% for listing in listings %}
+        {% if not listing.is_open %}
+            <div style="color: grey; text-decoration: line-through;">
+                <img src="{{ listing.img_url }}" alt="{{ listing.title }}">
+                <h3><strong>{{ listing.title }}</strong></h3>
+                <p>{{ listing.description }}</p>
+                    <p>Final bid: {{ listing.current_bid }}</p>
+                    <p>Winner: {{ listing.highest_bidder.username }}</p>
+                <p><a href="{% url 'listing_detail' listing.id %}">Go to this listing's page</a></p>
+            </div>
+        {% endif %}
+    {% endfor %}
 {% endblock %}
