@@ -1,0 +1,21 @@
+# TODO Implementations:
+
+Bidding:
+    Listing owner should not be able to bid on listing (not required but makes sense)
+
+Close Listing:
+    -user who placed highest bid is the winner. filter bid.listing with amount == current_bid
+    and take the user.
+    is_open is set to False
+
+
+Watchlist:
+    Display Watchlist
+    toggle_watchlist from Watchlitg page (optional)
+
+Categories:
+    Display listings by category
+
+Others:
+    display closed listings in grey in index.
+
