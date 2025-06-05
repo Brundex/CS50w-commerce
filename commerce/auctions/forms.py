@@ -6,3 +6,7 @@ class NewListingForm(forms.ModelForm):
         model = Listing
         exclude = ["owner", "current_bid", "is_open"]
         
+class BiddingForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        exclude = ["user", "listing"]

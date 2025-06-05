@@ -14,19 +14,27 @@
                             <li>Current bid: No bids yet</li>
                         {% else %}
                             <li>Current bid: {{listing.current_bid }}</li>
-                        {% endif %} 
+                        {% endif %}
+                        <li>
+                            <form action="{% url 'place_bid' listing.id %}"method="post">
+                                {% csrf_token %}
+                                {{ form }}
+                                <input type="submit">
+                            </form>
+                            {% if messages %}
+                                <ul class="messages">
+                                    {% for message in messages %}
+                                        <li class="{{ message.tags }}">{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
                         <li>Status: {% if listing.is_open == True %}Open{% else%}Closed{% endif %}</li>
                     </ul>
-                    <form action="" method="post">
 
-                        <input type="number" placeholder="Place your bid">
-                        <input type="submit">
-                    </form>
-
-                    {% comment %} TODO lógica si está en watchlist, sacarlo de watchlist {% endcomment %}
-                    <form action="" method="post">
-                   
-                        <button type="submit">Add to watchlist</button>
+                    <form action="{% url 'toggle_watchlist' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">{% if listing not in user.watchlist.all %}Add to watchlist{% else %}Remove from watchlist{% endif %}</button>
                     </form>
 
                     {% comment %} TODO craer comentario {% endcomment %}

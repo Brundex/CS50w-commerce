@@ -1,9 +1,12 @@
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from decimal import InvalidOperation, Decimal, ROUND_DOWN
 
 from auctions.forms import *
 
@@ -88,20 +91,66 @@ def new_listing(request):
         "form": NewListingForm()
     })
 
-def listing(request, id):
+def listing_detail(request, id):
     return render(request, "auctions/listing.html", {
-        "listing": Listing.objects.get(id=id)
+        "listing": Listing.objects.get(id=id),
+        "user": User.objects.get(id=request.user.id),
+        "form": BiddingForm()
     })
-    
-def toggle_watchlist(request, id):
-    # Si 
-    return
 
+@login_required
+def toggle_watchlist(request, id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=id)
+        user = request.user
+        
+        if listing not in user.watchlist.all():
+            user.watchlist.add(listing)
+            print(user.watchlist.all())
+
+        else:
+            user.watchlist.remove(listing)
+            print(user.watchlist.all())
+
+        return redirect("listing_detail", id=listing.id)
+    
+    else:
+        return HttpResponseNotAllowed(["POST"])            
+        
+@login_required
 def place_bid(request, id):
+    if request.method == "POST":
+        form = BiddingForm(request.POST)
+        try:
+            listing = Listing.objects.get(id=id)
+        except InvalidOperation:
+            return HttpResponse("Invalid value", status=500)
+        
+        if form.is_valid():
+            amount = form.cleaned_data["amount"]
+            amount = Decimal(amount).quantize(Decimal("0.000000001"), rounding=ROUND_DOWN)
+            if (listing.current_bid == 0 and amount >= listing.starting_bid) or (listing.current_bid != 0 and amount > listing.current_bid):
+                bid = form.save(commit=False)
+                bid.listing = listing
+                bid.user = request.user
+                listing.current_bid = amount
+                bid.save()
+                print("Bid saved correctly")
+                listing.save()
+                return redirect("listing_detail", id=listing.id)
+            else:
+                messages.error(request, "Your bid must be higher than the current bid.")
+        else:
+            messages.error(request, "Invalid form submission.")
+        
+        return redirect("listing_detail", id=listing.id)
+
+        
+        
+        
     # Tiene que ser mayor a current_bid. SI no hay bids, tiene que ser mayor o igual a starting_bid
     # Actualiza current_bid
     # El owner no puede pujar
-    return
 
 def close_listing(request, id):
     # Solo puede ser hecho por el owner

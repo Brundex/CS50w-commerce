@@ -23,7 +23,7 @@ class Listing(models.Model):
     
     # Bidding
     starting_bid = models.DecimalField(max_digits=9, decimal_places=2, verbose_name="starting bid")
-    current_bid = models.DecimalField(max_digits=9, decimal_places=9, default=0)
+    current_bid = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     
     # State
     is_open = models.BooleanField(default=True)
