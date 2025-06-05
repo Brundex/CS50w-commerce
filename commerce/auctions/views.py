@@ -95,8 +95,10 @@ def listing_detail(request, id):
     return render(request, "auctions/listing.html", {
         "listing": Listing.objects.get(id=id),
         "user": User.objects.get(id=request.user.id),
-        "form": BiddingForm()
-    })
+        "form": BiddingForm(),
+        "comments": Comment.objects.filter(listing__id=id).order_by("-timestamp"),
+        "comment_form": CommentForm()
+        })
 
 @login_required
 def toggle_watchlist(request, id):
@@ -172,7 +174,25 @@ def close_listing(request, id):
         listing.save()
         
         return redirect("listing_detail", id=listing.id)
-    return redirect("listing_detail", id=id)
-
+    else:
+        return HttpResponseNotAllowed(["POST"])
+    
+@login_required
 def add_comment(request, id):
-    return   
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        try:
+            listing = Listing.objects.get(id=id)
+        except Listing.DoesNotExist:
+            return HttpResponse("Listing not found", status=404)
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.listing = listing
+            comment.author = request.user
+            comment.save()
+            return redirect("listing_detail", id=listing.id)
+        else:
+            messages.error(request, "Invalid comment submission.")
+            return redirect("listing_detail", id=listing.id)
+    return HttpResponseNotAllowed(["POST"])

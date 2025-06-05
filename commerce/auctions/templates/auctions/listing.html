@@ -49,8 +49,22 @@
                         <button type="submit">{% if listing not in user.watchlist.all %}Add to watchlist{% else %}Remove from watchlist{% endif %}</button>
                     </form>
 
-                    {% comment %} TODO craer comentario {% endcomment %}
-                    {% comment %} TODO listar comentarios {% endcomment %}
+                    <div id="comments"></div>
+                    <form action="{% url 'add_comment' listing.id %}" method="post">
+                        {% csrf_token %}
+                        {{ comment_form }}
+                        <input type="submit" value="Add Comment">
+                    </form>
+                    <h3>Comments:</h3>
+                    <ul>
+                        {% for comment in comments %}
+                            <li>
+                                <p>by <strong>{{ comment.author.username }}</strong></p>
+                                <p> {{ comment.body }} </p>
+                                <span class="text-muted">({{ comment.timestamp|date:"Y-m-d H:i" }})</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
 
 {% endblock %}
